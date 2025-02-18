@@ -26,6 +26,16 @@ function(instance, context) {
             instance.data.container = document.createElement('div');
             instance.data.container.id = 'gantt-chart';
             instance.canvas.append(instance.data.container);
+            
+            // Add custom styles for Gantt chart
+            const styleElement = document.createElement('style');
+            styleElement.textContent = `
+                /* Progress bar styles */
+                .bar-wrapper .bar-progress {
+                    fill: #FF7F00 !important; /* Progress bar color */
+                }
+            `;
+            document.head.appendChild(styleElement);
         }
     
         // Reset state
