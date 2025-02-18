@@ -105,7 +105,7 @@ function(instance, context) {
         }
       }
 
-      // Immediately capture a snapshot of all changed task data
+      // Capture task data for processing
       const taskSnapshots = changedTasks.map(task => ({
         id: task.id,
         name: task.name,
@@ -132,7 +132,7 @@ function(instance, context) {
       
       instance.data.internalUpdate = true;
       
-      // Process all changed tasks sequentially using our snapshots
+      // Process tasks sequentially
       (async function processTasksSequentially() {
         for (const taskSnapshot of taskSnapshots) {
           const indent = taskSnapshot.id === ds.activeTaskId ? '' : '  ';
@@ -169,7 +169,7 @@ function(instance, context) {
           instance.triggerEvent('wf_task_indiv_date_change');
           
           // Wait for the database update
-          await new Promise(resolve => setTimeout(resolve, 100));
+          await new Promise(resolve => setTimeout(resolve, 500));
         }
         
         console.log('\n✅ Task Update Process Completed ----------------');
