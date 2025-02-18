@@ -47,7 +47,7 @@
             "value": "boolean"
         }
     },
-    "has_reset_fn": false,
+    "has_reset_fn": true,
     "icon": "ion-android-options",
     "platform_type": "web",
     "property_applications": {
