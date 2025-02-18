@@ -1,4 +1,5 @@
 function(instance, context) {
+    console.log('🙂');
     // Create container element for the Gantt chart
     instance.data.container = document.createElement('div');
     instance.data.container.id = 'gantt-chart';
@@ -169,7 +170,7 @@ function(instance, context) {
           instance.triggerEvent('wf_task_indiv_date_change');
           
           // Wait for the database update
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise(resolve => setTimeout(resolve, 300));
         }
         
         console.log('\n✅ Task Update Process Completed ----------------');
