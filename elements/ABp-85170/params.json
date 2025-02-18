@@ -1,0 +1,101 @@
+{
+    "add_is_visible": true,
+    "can_fit_height": true,
+    "can_fit_width": true,
+    "category": "visual elements",
+    "default_dim": {
+        "height": 20,
+        "width": 400
+    },
+    "display": "Gantt Chart",
+    "events": {
+        "AEC": {
+            "caption": "Task is clicked",
+            "name": "task_clicked"
+        },
+        "AED": {
+            "caption": "task drag ends",
+            "name": "task_drag_ended"
+        }
+    },
+    "fields": {
+        "ABs": {
+            "caption": "Data Type",
+            "editor": "custom_type",
+            "name": "data_type",
+            "rank": 0
+        },
+        "ABt": {
+            "caption": "Data Source",
+            "editor": "DynamicValue",
+            "is_list": true,
+            "name": "data_source",
+            "rank": 1,
+            "value": "custom_data_ABs"
+        },
+        "ABu": {
+            "caption": "Read only",
+            "default_val": false,
+            "editor": "DynamicValue",
+            "name": "read_only",
+            "optional": true,
+            "rank": 2,
+            "value": "boolean"
+        }
+    },
+    "icon": "ion-android-checkbox-blank",
+    "platform_type": "web",
+    "property_applications": {
+        "Background": true,
+        "Border": true,
+        "BoxShadow": true,
+        "Font": true,
+        "MinWidth": true,
+        "Padding": true,
+        "resizable": true
+    },
+    "states": {
+        "ABw": {
+            "caption": "Modified tasks",
+            "doc": "JSON-formatted string of the modified tasks",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "modified_tasks",
+            "value": "text"
+        },
+        "AEH": {
+            "caption": "Active task ID",
+            "doc": "ID of active task",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "task_id",
+            "value": "custom_data_ABs"
+        },
+        "AEK": {
+            "caption": "wf_task_id",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "wf_task_id",
+            "value": "custom_data_ABs"
+        },
+        "AEL": {
+            "caption": "wf_start_date",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "wf_start_date",
+            "value": "text"
+        },
+        "AEM": {
+            "caption": "wf_end_date",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "wf_end_date",
+            "value": "text"
+        }
+    }
+}

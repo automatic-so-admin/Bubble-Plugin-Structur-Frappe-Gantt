@@ -1,0 +1,117 @@
+{
+    "add_is_visible": true,
+    "can_fit_height": true,
+    "can_fit_width": true,
+    "category": "visual elements",
+    "default_dim": {
+        "height": 200,
+        "width": 400
+    },
+    "display": "Gantt Chart (David)",
+    "events": {
+        "AEN": {
+            "caption": "Task is clicked",
+            "name": "task_clicked"
+        },
+        "AEO": {
+            "caption": "task drag ends",
+            "name": "task_drag_ended"
+        },
+        "AEY": {
+            "caption": "Each task's dates modified",
+            "doc": "Runs for each task (including dependencies) after a user drags a task.",
+            "name": "wf_task_indiv_date_change"
+        },
+        "AEq": {
+            "caption": "loading_complete",
+            "name": "loading_complete"
+        }
+    },
+    "fields": {
+        "AEP": {
+            "caption": "Data Type",
+            "editor": "custom_type",
+            "name": "data_type",
+            "rank": 0
+        },
+        "AEQ": {
+            "caption": "Data Source",
+            "editor": "DynamicValue",
+            "is_list": true,
+            "name": "data_source",
+            "rank": 1,
+            "value": "custom_data_AEP"
+        },
+        "AER": {
+            "caption": "Read only",
+            "default_val": false,
+            "editor": "DynamicValue",
+            "name": "read_only",
+            "optional": true,
+            "rank": 2,
+            "value": "boolean"
+        }
+    },
+    "icon": "ion-android-checkbox-blank",
+    "platform_type": "web",
+    "property_applications": {
+        "Background": true,
+        "Border": true,
+        "BoxShadow": true,
+        "Font": true,
+        "MinWidth": true,
+        "Padding": true,
+        "resizable": true
+    },
+    "states": {
+        "AEU": {
+            "caption": "task ID",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "task_id",
+            "value": "custom_data_AEP"
+        },
+        "AEl": {
+            "caption": "Update task list",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\treturn [];\n}"
+            },
+            "is_list": true,
+            "name": "updated_task_list",
+            "value": "text"
+        },
+        "AEm": {
+            "caption": "wf_task_id",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "wf_task_id",
+            "value": "custom_data_AEP"
+        },
+        "AEn": {
+            "caption": "wf_start_date",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "wf_start_date",
+            "value": "date"
+        },
+        "AEo": {
+            "caption": "wf_end_date",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "wf_end_date",
+            "value": "date"
+        },
+        "AEp": {
+            "caption": "is_loading?",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n\n\n}"
+            },
+            "name": "is_loading",
+            "value": "boolean"
+        }
+    }
+}
