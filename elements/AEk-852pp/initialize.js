@@ -1,5 +1,5 @@
 function(instance, context) {
-    console.log('🙂');
+    console.log('🙂🤌🏻');
     
     // Initialize the listeners array immediately
     if (!instance.data._ganttListeners) {
