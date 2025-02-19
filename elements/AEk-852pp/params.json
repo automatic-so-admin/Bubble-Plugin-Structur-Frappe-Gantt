@@ -67,12 +67,12 @@
             "rank": 5
         },
         "AFa": {
-            "caption": "Task Name",
-            "doc": "Map the task name to your database field.",
-            "editor": "custom_field_AEc",
-            "field_type_restriction": "text_image_file",
-            "name": "task_name",
-            "rank": 20
+            "caption": "Show View Mode Selector",
+            "default_val": false,
+            "editor": "DynamicValue",
+            "name": "show_view_mode_selector",
+            "rank": 20,
+            "value": "boolean"
         },
         "AGA": {
             "caption": "Date Format",

@@ -22,7 +22,7 @@ function(instance, properties, context) {
     const ganttConfig = {
         // Core display options
         view_mode: properties.view_mode || 'Day',
-        view_mode_select: false,
+        view_mode_select: properties.show_view_mode_selector || false,
         date_format: properties.date_format || 'MM-DD-YYYY',
         popup_on: properties.popup_trigger || 'hover',
         language: 'en',
@@ -68,11 +68,10 @@ function(instance, properties, context) {
                 return '';
             }
             return `
-                <div style="padding: 8px 12px; font-family: Inter, sans-serif; font-size: 14px; color: #333; max-width: 220px;">
-                    <h4 style="margin: 0 0 6px 0; font-size: 16px; font-weight: bold;">${task.name}</h4>
+                <div style="padding: 4px 4px; font-family: Inter, sans-serif; font-size: 12px; color: #333; max-width: 220px; text-align: center;">
+                    <h4 style="margin: 0 0 6px 0; font-size: 14px; font-weighzd;"><strong>${task.name}</strong></h4>
                     <div>
-                        <div style="margin-bottom: 4px;"><strong>Start:</strong> ${task.start.toLocaleDateString()}</div>
-                        <div><strong>End:</strong> ${task.end.toLocaleDateString()}</div>
+                        <div style="margin-bottom: 8px;">${task.end.toLocaleDateString()} <strong>-</strong> ${task.end.toLocaleDateString()}</div>
                     </div>
                 </div>
                 `;
