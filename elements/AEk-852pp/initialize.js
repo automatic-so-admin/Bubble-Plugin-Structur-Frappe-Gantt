@@ -1,5 +1,5 @@
 function(instance, context) {
-    console.log('🙂🤌🏻');
+    console.log('🙂🤌🏻---');
     
     // Initialize the listeners array immediately
     if (!instance.data._ganttListeners) {
@@ -15,7 +15,6 @@ function(instance, context) {
             });
             instance.data._ganttListeners = [];
         } else {
-            // Ensure array exists if it somehow got removed
             instance.data._ganttListeners = [];
         }
 
@@ -26,17 +25,25 @@ function(instance, context) {
             instance.data.container = document.createElement('div');
             instance.data.container.id = 'gantt-chart';
             instance.canvas.append(instance.data.container);
-            
-            // Add custom styles for Gantt chart
-            const styleElement = document.createElement('style');
-            styleElement.textContent = `
-                /* Progress bar styles */
-                .bar-wrapper .bar-progress {
-                    fill: #FF7F00 !important; /* Progress bar color */
-                }
-            `;
+        }
+
+        // Add or update custom styles
+        const styleId = 'gantt-custom-styles';
+        let styleElement = document.getElementById(styleId);
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            styleElement.id = styleId;
             document.head.appendChild(styleElement);
         }
+        
+        // Update styles with progress bar color from properties or default
+        const progressBarColor = instance.data.progressBarColor || '#FF7F00';
+        styleElement.textContent = `
+            /* Progress bar styles */
+            .bar-wrapper .bar-progress {
+                fill: ${progressBarColor} !important;
+            }
+        `;
     
         // Reset state
         instance.data.last_dragged_task_date = null;
@@ -56,96 +63,11 @@ function(instance, context) {
             operationHistory: []
         };
     
-        // Create the Gantt instance
+        // Create the Gantt instance with minimal settings
+        // Full configuration will be applied in update
         instance.data.gantt = new Gantt(instance.data.container, [], {
-            auto_move_label: false,
-            move_dependencies: true,
-            readonly_progress: true,
-            view_mode_select: true,
-            popup: false,
-            scroll_to: instance.data.last_dragged_task_date || "today",
-            readonly: false,
-            holidays: {
-                '#bfdbfe': []
-            },
-            on_date_change: function(task, start, end) {
-                if (!task || !task.id) return;
-                
-                // Store the new dates
-                task._start = start;
-                task._end = end;
-                
-                // If this task has dependencies, ensure they're properly rendered
-                if (task.dependencies && task.dependencies.length > 0) {
-                    const allTasks = instance.data.gantt.tasks;
-                    const dependentTasks = allTasks.filter(t => 
-                        task.dependencies.includes(t.id) || 
-                        (t.dependencies && t.dependencies.includes(task.id))
-                    );
-                    
-                    // Ensure all dependent tasks have their bars
-                    const unrenderedDependencies = dependentTasks.filter(t => !t.$bar);
-                    if (unrenderedDependencies.length > 0) {
-                        console.warn('Re-rendering dependencies:', unrenderedDependencies);
-                        
-                        // First try to force create bars for unrendered tasks
-                        unrenderedDependencies.forEach(t => {
-                            if (!t.$bar) {
-                                instance.data.gantt.trigger_task_click(t.id);
-                            }
-                        });
-                        
-                        // Then refresh to ensure arrows are drawn
-                        requestAnimationFrame(() => {
-                            instance.data.gantt.refresh(allTasks);
-                        });
-                        return;
-                    }
-                }
-            },
-            on_click: function(task) {
-                if (!task || !task.id) return false;
-                return false;
-            },
-            on_refresh: function(tasks) {
-                if (!tasks || !Array.isArray(tasks)) {
-                    console.warn('Invalid tasks data structure:', tasks);
-                    return;
-                }
-                
-                // Ensure all tasks have necessary properties before rendering
-                tasks.forEach((task, index) => {
-                    // Validate task has required properties
-                    if (!task.$bar && task.dependencies && task.dependencies.length > 0) {
-                        console.log(`Initializing bar for dependent task ${task.id}`);
-                        // Force bar creation if missing
-                        instance.data.gantt.trigger_task_click(task.id);
-                    }
-                    
-                    console.log(`Task ${index} validation:`, {
-                        id: !!task.id,
-                        name: !!task.name,
-                        start: !!task.start,
-                        end: !!task.end,
-                        $bar: !!task.$bar,
-                        dependencies: task.dependencies,
-                        raw: task
-                    });
-                });
-                
-                // Additional dependency validation after refresh
-                const tasksWithDependencies = tasks.filter(t => t.dependencies && t.dependencies.length > 0);
-                if (tasksWithDependencies.length > 0) {
-                    requestAnimationFrame(() => {
-                        tasksWithDependencies.forEach(task => {
-                            if (!task.$bar) {
-                                console.warn(`Task ${task.id} missing $bar after refresh, attempting recovery`);
-                                instance.data.gantt.trigger_task_click(task.id);
-                            }
-                        });
-                    });
-                }
-            }
+            view_mode: 'Day',
+            date_format: 'DD-MM-YYYY'
         });
 
         instance.data.initializationTime = Date.now();
@@ -237,15 +159,15 @@ function(instance, context) {
                 updatedEnd: task._end
             }));
             
-            instance.publishState('modified_tasks', JSON.stringify(changedTasks));
+            // instance.publishState('modified_tasks', JSON.stringify(changedTasks));
             
             const activeTask = instance.data.gantt.tasks.find(x => x.id === ds.activeTaskId);
             if (activeTask) {
                 instance.data.last_dragged_task_date = activeTask._start;
             }
             
-            instance.publishState('task_id', ds.activeTaskId);
-            instance.triggerEvent('task_drag_ended');
+            // instance.publishState('task_id', ds.activeTaskId);
+            // instance.triggerEvent('task_drag_ended');
             
             instance.data.internalUpdate = true;
             
@@ -346,7 +268,7 @@ function(instance, context) {
             const duration = Date.now() - ds.startTime;
             if (ds.activeTaskId) {
                 if (!ds.isDragging && duration < 200) {
-                    instance.publishState('task_id', ds.activeTaskId);
+                    instance.publishState('wf_task_id', ds.activeTaskId);
                     instance.triggerEvent('task_clicked');
                 } else if (ds.isDragging) {
                     endDrag();
@@ -390,6 +312,21 @@ function(instance, context) {
 
     // Initial setup
     instance.data.initializeGantt();
+
+    // Add this helper
+    instance.data.getCurrentDataSource = function() {
+        // Try to get data source from element properties
+        if (instance.data.gantt && instance.data.gantt._properties && instance.data.gantt._properties.data_source) {
+            return instance.data.gantt._properties.data_source;
+        }
+        
+        // Fallback to context properties if available
+        if (context && context.properties && context.properties.data_source) {
+            return context.properties.data_source;
+        }
+        
+        return null;
+    };
 
     // Add this helper
     instance.data.checkInitialization = function() {

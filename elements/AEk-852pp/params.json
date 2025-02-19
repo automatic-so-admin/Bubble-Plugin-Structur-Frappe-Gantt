@@ -10,15 +10,11 @@
     "display": "Structur Gantt",
     "events": {
         "AEZ": {
-            "caption": "Task is clicked",
+            "caption": "A task is clicked",
             "name": "task_clicked"
         },
-        "AEa": {
-            "caption": "task drag ends",
-            "name": "task_drag_ended"
-        },
         "AEb": {
-            "caption": "Each task's dates modified",
+            "caption": "A task's dates change",
             "doc": "Runs for each task (including dependencies) after a user drags a task.",
             "name": "wf_task_indiv_date_change"
         }
@@ -45,6 +41,169 @@
             "optional": true,
             "rank": 2,
             "value": "boolean"
+        },
+        "AFW": {
+            "caption": "Progress Bar Color",
+            "default_val": "rgba(255, 127, 0, 1)",
+            "editor": "Color",
+            "name": "progress_bar_color",
+            "optional": true,
+            "rank": 3
+        },
+        "AFX": {
+            "caption": "View Mode",
+            "default_val": "Day",
+            "doc": "Day, Week, Month",
+            "editor": "DynamicValue",
+            "name": "view_mode",
+            "rank": 4,
+            "value": "text"
+        },
+        "AFY": {
+            "caption": "Bar Height",
+            "default_val": 40,
+            "editor": "StaticNumber",
+            "name": "bar_height",
+            "rank": 5
+        },
+        "AFa": {
+            "caption": "Task Name",
+            "doc": "Map the task name to your database field.",
+            "editor": "custom_field_AEc",
+            "field_type_restriction": "text_image_file",
+            "name": "task_name",
+            "rank": 20
+        },
+        "AGA": {
+            "caption": "Date Format",
+            "default_val": "MM-DD-YYYY",
+            "doc": "Format for displaying dates in tooltips/headers",
+            "editor": "StaticText",
+            "name": "date_format",
+            "optional": true,
+            "rank": 6
+        },
+        "AGB": {
+            "caption": "Popup Trigger",
+            "default_val": "hover",
+            "doc": "Shows task info popup on hover vs click",
+            "editor": "Dropdown",
+            "name": "popup_trigger",
+            "optional": true,
+            "options": "hover,click",
+            "rank": 7
+        },
+        "AGC": {
+            "caption": "Bar Corner Radius",
+            "default_val": 8,
+            "doc": "Rounded corner radius of task bars",
+            "editor": "StaticNumber",
+            "name": "bar_corner_radius",
+            "optional": true,
+            "rank": 8
+        },
+        "AGD": {
+            "caption": "Arrow Curve",
+            "default_val": 10,
+            "doc": "Curve radius of dependency arrows",
+            "editor": "StaticNumber",
+            "name": "arrow_curve",
+            "optional": true,
+            "rank": 9
+        },
+        "AGE": {
+            "caption": "Task Padding",
+            "default_val": 16,
+            "doc": "Padding around task bars",
+            "editor": "StaticNumber",
+            "name": "padding",
+            "optional": true,
+            "rank": 10
+        },
+        "AGF": {
+            "caption": "Column Width",
+            "default_val": 45,
+            "doc": "Width of each timeline column",
+            "editor": "StaticNumber",
+            "name": "column_width",
+            "optional": true,
+            "rank": 11
+        },
+        "AGG": {
+            "caption": "Upper Header Height",
+            "default_val": 70,
+            "doc": "Height of top timeline header section",
+            "editor": "StaticNumber",
+            "name": "upper_header_height",
+            "optional": true,
+            "rank": 12
+        },
+        "AGH": {
+            "caption": "Lower Header Height",
+            "default_val": 40,
+            "doc": "Height of bottom timeline header section",
+            "editor": "StaticNumber",
+            "name": "lower_header_height",
+            "optional": true,
+            "rank": 13
+        },
+        "AGI": {
+            "caption": "Grid Lines",
+            "default_val": "both",
+            "doc": "Shows horizontal and/or vertical grid lines",
+            "editor": "Dropdown",
+            "name": "grid_lines",
+            "optional": true,
+            "options": "both,vertical,horizontal,none",
+            "rank": 14
+        },
+        "AGK": {
+            "caption": "Show Expected Progress",
+            "default_val": false,
+            "doc": "Shows expected progress indicators",
+            "editor": "DynamicValue",
+            "name": "show_expected_progress",
+            "optional": true,
+            "rank": 15,
+            "value": "boolean"
+        },
+        "AGL": {
+            "caption": "Move Dependencies",
+            "default_val": true,
+            "doc": "Dependent tasks move together",
+            "editor": "DynamicValue",
+            "name": "move_dependencies",
+            "optional": true,
+            "rank": 16,
+            "value": "boolean"
+        },
+        "AGM": {
+            "caption": "Snap Interval",
+            "default_val": "1d",
+            "doc": "Tasks snap to intervals when dragging (e.g. 1d, 1w, 1m)",
+            "editor": "StaticText",
+            "name": "snap_at",
+            "optional": true,
+            "rank": 17
+        },
+        "AGN": {
+            "caption": "Show Today Button",
+            "default_val": true,
+            "doc": "Shows button to scroll to today's date",
+            "editor": "DynamicValue",
+            "name": "today_button",
+            "optional": true,
+            "rank": 18,
+            "value": "boolean"
+        },
+        "AGO": {
+            "caption": "Initial Scroll Date",
+            "doc": "The date to scroll to when the chart first loads. Defaults to today if not set.",
+            "editor": "DynamicValue",
+            "name": "scroll_to_date",
+            "optional": true,
+            "rank": 19,
+            "value": "date"
         }
     },
     "has_reset_fn": true,
@@ -60,24 +219,6 @@
         "resizable": true
     },
     "states": {
-        "AEf": {
-            "caption": "Modified tasks",
-            "doc": "JSON-formatted string of the modified tasks",
-            "initialization_code": {
-                "fn": "function(properties, context) {\n\n\n\n}"
-            },
-            "name": "modified_tasks",
-            "value": "text"
-        },
-        "AEg": {
-            "caption": "Active task ID",
-            "doc": "ID of active task",
-            "initialization_code": {
-                "fn": "function(properties, context) {\n\n\n\n}"
-            },
-            "name": "task_id",
-            "value": "custom_data_AEc"
-        },
         "AEh": {
             "caption": "wf_task_id",
             "initialization_code": {

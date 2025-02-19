@@ -1,0 +1,4 @@
+{
+    "caption": "Refresh Gantt Data",
+    "doc": "Refreshes the gantt chart's datasource with updated values."
+}
