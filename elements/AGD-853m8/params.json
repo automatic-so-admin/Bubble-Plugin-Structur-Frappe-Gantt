@@ -7,26 +7,26 @@
         "height": 20,
         "width": 400
     },
-    "display": "Structur Gantt (Save Btn)",
+    "display": "Structur Gantt (triggerEvent)",
     "events": {
-        "AEZ": {
+        "AFd": {
             "caption": "A task is clicked",
             "name": "task_clicked"
         },
-        "AEb": {
+        "AFe": {
             "caption": "A task's dates change",
             "doc": "Runs for each task (including dependencies) after a user drags a task.",
             "name": "wf_task_indiv_date_change"
         }
     },
     "fields": {
-        "AEc": {
+        "AFf": {
             "caption": "Data Type",
             "editor": "custom_type",
             "name": "data_type",
             "rank": 0
         },
-        "AEd": {
+        "AFg": {
             "caption": "Data Source",
             "editor": "DynamicValue",
             "is_list": true,
@@ -34,7 +34,7 @@
             "rank": 1,
             "value": "custom_data_AEc"
         },
-        "AEe": {
+        "AFh": {
             "caption": "Read only",
             "editor": "DynamicValue",
             "name": "read_only",
@@ -42,7 +42,7 @@
             "rank": 2,
             "value": "boolean"
         },
-        "AFW": {
+        "AFi": {
             "caption": "Progress Bar Color",
             "default_val": "rgba(255, 127, 0, 1)",
             "editor": "Color",
@@ -50,7 +50,7 @@
             "optional": true,
             "rank": 3
         },
-        "AFX": {
+        "AFj": {
             "caption": "View Mode",
             "default_val": "Day",
             "doc": "Day, Week, Month",
@@ -59,22 +59,14 @@
             "rank": 4,
             "value": "text"
         },
-        "AFY": {
+        "AFk": {
             "caption": "Bar Height",
             "default_val": 40,
             "editor": "StaticNumber",
             "name": "bar_height",
             "rank": 5
         },
-        "AFa": {
-            "caption": "Show View Mode Selector",
-            "default_val": false,
-            "editor": "DynamicValue",
-            "name": "show_view_mode_selector",
-            "rank": 20,
-            "value": "boolean"
-        },
-        "AGA": {
+        "AFl": {
             "caption": "Date Format",
             "default_val": "MM-DD-YYYY",
             "doc": "Format for displaying dates in tooltips/headers",
@@ -83,7 +75,7 @@
             "optional": true,
             "rank": 6
         },
-        "AGB": {
+        "AFm": {
             "caption": "Popup Trigger",
             "default_val": "hover",
             "doc": "Shows task info popup on hover vs click",
@@ -93,7 +85,7 @@
             "options": "hover,click",
             "rank": 7
         },
-        "AGC": {
+        "AFn": {
             "caption": "Bar Corner Radius",
             "default_val": 8,
             "doc": "Rounded corner radius of task bars",
@@ -102,7 +94,7 @@
             "optional": true,
             "rank": 8
         },
-        "AGD": {
+        "AFo": {
             "caption": "Arrow Curve",
             "default_val": 10,
             "doc": "Curve radius of dependency arrows",
@@ -111,7 +103,7 @@
             "optional": true,
             "rank": 9
         },
-        "AGE": {
+        "AFp": {
             "caption": "Task Padding",
             "default_val": 16,
             "doc": "Padding around task bars",
@@ -120,7 +112,7 @@
             "optional": true,
             "rank": 10
         },
-        "AGF": {
+        "AFq": {
             "caption": "Column Width",
             "default_val": 45,
             "doc": "Width of each timeline column",
@@ -129,7 +121,7 @@
             "optional": true,
             "rank": 11
         },
-        "AGG": {
+        "AFr": {
             "caption": "Upper Header Height",
             "default_val": 70,
             "doc": "Height of top timeline header section",
@@ -138,7 +130,7 @@
             "optional": true,
             "rank": 12
         },
-        "AGH": {
+        "AFs": {
             "caption": "Lower Header Height",
             "default_val": 40,
             "doc": "Height of bottom timeline header section",
@@ -147,7 +139,7 @@
             "optional": true,
             "rank": 13
         },
-        "AGI": {
+        "AFt": {
             "caption": "Grid Lines",
             "default_val": "both",
             "doc": "Shows horizontal and/or vertical grid lines",
@@ -157,7 +149,7 @@
             "options": "both,vertical,horizontal,none",
             "rank": 14
         },
-        "AGK": {
+        "AFu": {
             "caption": "Show Expected Progress",
             "default_val": false,
             "doc": "Shows expected progress indicators",
@@ -167,7 +159,7 @@
             "rank": 15,
             "value": "boolean"
         },
-        "AGL": {
+        "AFv": {
             "caption": "Move Dependencies",
             "default_val": true,
             "doc": "Dependent tasks move together",
@@ -177,7 +169,7 @@
             "rank": 16,
             "value": "boolean"
         },
-        "AGM": {
+        "AFw": {
             "caption": "Snap Interval",
             "default_val": "1d",
             "doc": "Tasks snap to intervals when dragging (e.g. 1d, 1w, 1m)",
@@ -186,7 +178,7 @@
             "optional": true,
             "rank": 17
         },
-        "AGN": {
+        "AFx": {
             "caption": "Show Today Button",
             "default_val": true,
             "doc": "Shows button to scroll to today's date",
@@ -196,7 +188,7 @@
             "rank": 18,
             "value": "boolean"
         },
-        "AGO": {
+        "AFy": {
             "caption": "Initial Scroll Date",
             "doc": "The date to scroll to when the chart first loads. Defaults to today if not set.",
             "editor": "DynamicValue",
@@ -204,6 +196,14 @@
             "optional": true,
             "rank": 19,
             "value": "date"
+        },
+        "AFz": {
+            "caption": "Show View Mode Selector",
+            "default_val": false,
+            "editor": "DynamicValue",
+            "name": "show_view_mode_selector",
+            "rank": 20,
+            "value": "boolean"
         }
     },
     "has_reset_fn": true,
@@ -219,7 +219,7 @@
         "resizable": true
     },
     "states": {
-        "AEh": {
+        "AGA": {
             "caption": "wf_task_id",
             "initialization_code": {
                 "fn": "function(properties, context) {\n\n\n\n}"
@@ -227,7 +227,7 @@
             "name": "wf_task_id",
             "value": "custom_data_AEc"
         },
-        "AEi": {
+        "AGB": {
             "caption": "wf_start_date",
             "initialization_code": {
                 "fn": "function(properties, context) {\n\n\n\n}"
@@ -235,7 +235,7 @@
             "name": "wf_start_date",
             "value": "date"
         },
-        "AEj": {
+        "AGC": {
             "caption": "wf_end_date",
             "initialization_code": {
                 "fn": "function(properties, context) {\n\n\n\n}"
