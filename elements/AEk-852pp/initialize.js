@@ -43,6 +43,19 @@ function(instance, context) {
             .bar-wrapper .bar-progress {
                 fill: ${progressBarColor} !important;
             }
+            
+            /* Add grab cursor for draggable areas */
+            .gantt-container {
+                cursor: grab !important;
+            }
+            .gantt-container.is-dragging {
+                cursor: grabbing !important;
+            }
+            /* Reset cursor for interactive elements */
+            .gantt-container .bar-wrapper,
+            .gantt-container .handle-group {
+                cursor: default;
+            }
         `;
     
         // Reset state
@@ -308,6 +321,43 @@ function(instance, context) {
         addListener(instance.data.container, 'touchmove', function(e) {
             // Handle touch move if needed
         }, { passive: true });
+
+        // Add drag-to-scroll functionality
+        let isScrolling = false;
+        let startX;
+        let scrollLeft;
+
+        // Find the gantt container element
+        const ganttContainer = instance.data.container.querySelector('.gantt-container');
+        if (!ganttContainer) return;
+
+        addListener(ganttContainer, 'mousedown', function(e) {
+            // Only proceed if not clicking on a task bar
+            if (e.target.closest('.bar-wrapper')) return;
+            
+            isScrolling = true;
+            startX = e.pageX - ganttContainer.offsetLeft;
+            scrollLeft = ganttContainer.scrollLeft;
+            ganttContainer.style.cursor = 'grabbing';
+            ganttContainer.style.userSelect = 'none';
+        });
+
+        addListener(document, 'mousemove', function(e) {
+            if (!isScrolling) return;
+            
+            e.preventDefault();
+            const x = e.pageX - ganttContainer.offsetLeft;
+            const walk = (x - startX) * 2; // Multiply by 2 for faster scrolling
+            ganttContainer.scrollLeft = scrollLeft - walk;
+        });
+
+        addListener(document, 'mouseup', function() {
+            if (!isScrolling) return;
+            
+            isScrolling = false;
+            ganttContainer.style.cursor = 'default';
+            ganttContainer.style.userSelect = '';
+        });
     }
 
     // Initial setup

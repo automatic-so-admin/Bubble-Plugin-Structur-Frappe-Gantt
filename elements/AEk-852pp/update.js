@@ -14,6 +14,19 @@ function(instance, properties, context) {
                 .bar-wrapper .bar-progress {
                     fill: ${instance.data.progressBarColor} !important;
                 }
+                
+                /* Add grab cursor for draggable areas */
+                .gantt-container {
+                    cursor: grab !important;
+                }
+                .gantt-container.is-dragging {
+                    cursor: grabbing !important;
+                }
+                /* Reset cursor for interactive elements */
+                .gantt-container .bar-wrapper,
+                .gantt-container .handle-group {
+                    cursor: default;
+                }
             `;
         }
     }
@@ -46,16 +59,18 @@ function(instance, properties, context) {
         // Interaction settings
         readonly: properties.read_only || false,
         readonly_dates: properties.read_only || false,
-        readonly_progress: true,
+        readonly_progress: properties.read_only || true,
         move_dependencies: typeof properties.move_dependencies !== 'undefined' ? properties.move_dependencies : true,
         snap_at: properties.snap_at || '1d',
         
         // Navigation
-        scroll_to: properties.scroll_to_date || instance.data.last_dragged_task_date || "today",
+        // scroll_to: properties.scroll_to_date || instance.data.last_dragged_task_date || "today",
+        scroll_to: "today",
         today_button: typeof properties.today_button !== 'undefined' ? properties.today_button : true,
         
         // Holiday handling
         holidays: {
+            'var(--g-weekend-highlight-color)': 'weekend',
             '#bfdbfe': []
         },
         ignore: [],
@@ -71,7 +86,7 @@ function(instance, properties, context) {
                 <div style="padding: 4px 4px; font-family: Inter, sans-serif; font-size: 12px; color: #333; max-width: 220px; text-align: center;">
                     <h4 style="margin: 0 0 6px 0; font-size: 14px; font-weighzd;"><strong>${task.name}</strong></h4>
                     <div>
-                        <div style="margin-bottom: 8px;">${task.end.toLocaleDateString()} <strong>-</strong> ${task.end.toLocaleDateString()}</div>
+                        <div style="margin-bottom: 2px;">${task.start.toLocaleDateString()} <strong>-</strong> ${task.end.toLocaleDateString()}</div>
                     </div>
                 </div>
                 `;
