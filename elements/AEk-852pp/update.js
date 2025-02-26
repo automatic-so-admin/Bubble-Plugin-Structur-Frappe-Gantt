@@ -1,91 +1,174 @@
 function(instance, properties, context) {
-    // Skip update if no container or properties
-    if (!instance.data.container || !properties || properties.bubble?.width <= 0 || properties.bubble?.height <= 0) {
+    // Only proceed if initialization is complete
+    if (!instance.data.initialized) {
         return;
     }
-    
-    // Set updating flag to prevent event loops
-    instance.data.isUpdating = true;
-    
-    // Initialize or reset updated tasks state if needed
-    if (properties.reset_changes === true || properties.clear_updates === true) {
-        instance.data.resetUpdatedTasks();
+
+    // Update progress bar color if changed
+    if (properties.progress_bar_color !== instance.data.progressBarColor) {
+        instance.data.progressBarColor = properties.progress_bar_color || '#FF7F00';
+        const styleElement = document.getElementById('gantt-custom-styles');
+        if (styleElement) {
+            styleElement.textContent = `
+                /* Progress bar styles */
+                .bar-wrapper .bar-progress {
+                    fill: ${instance.data.progressBarColor} !important;
+                }
+                
+                /* Add grab cursor for draggable areas */
+                .gantt-container {
+                    cursor: grab !important;
+                }
+                .gantt-container.is-dragging {
+                    cursor: grabbing !important;
+                }
+                /* Reset cursor for interactive elements */
+                .gantt-container .bar-wrapper,
+                .gantt-container .handle-group {
+                    cursor: default;
+                }
+            `;
+        }
     }
 
-    // Update container dimensions
-    if (properties.bubble) {
-        instance.data.container.style.width = properties.bubble.width + 'px';
-        instance.data.container.style.height = properties.bubble.height + 'px';
-    }
-    
-    // Get options from properties with sensible defaults
-    const ganttOptions = {
+    // Apply Gantt chart configuration based on properties
+    const ganttConfig = {
         // Core display options
         view_mode: properties.view_mode || 'Day',
-        date_format: properties.date_format || 'YYYY-MM-DD',
+        view_mode_select: properties.show_view_mode_selector || false,
+        date_format: properties.date_format || 'MM-DD-YYYY',
+        popup_on: properties.popup_trigger || 'hover',
         language: 'en',
         
         // Layout and dimensions
-        bar_height: properties.bar_height || 30,
+        bar_height: properties.bar_height || 32,
         bar_corner_radius: properties.bar_corner_radius || 3,
-        arrow_curve: properties.arrow_curve || 5,
-        padding: properties.padding || 18,
-        column_width: properties.column_width || 30,
+        arrow_curve: properties.arrow_curve || 10,
+        padding: properties.padding || 16,
+        column_width: properties.column_width || 45,
+        container_height: 'auto',
+        upper_header_height: properties.upper_header_height || 70,
+        lower_header_height: properties.lower_header_height || 40,
         
         // Styling and visual options
-        popup_trigger: properties.popup_trigger || 'click',
+        lines: properties.grid_lines || 'both',
+        auto_move_label: false,
+        show_expected_progress: properties.show_expected_progress || false,
+        infinite_padding: false,
         
         // Interaction settings
         readonly: properties.read_only || false,
-        readonly_dates: properties.readonly_dates || false, 
-        readonly_progress: properties.readonly_progress || true,
-        move_dependencies: properties.move_dependencies !== false, // Default true
+        readonly_dates: properties.read_only || false,
+        readonly_progress: properties.read_only || true,
+        move_dependencies: typeof properties.move_dependencies !== 'undefined' ? properties.move_dependencies : true,
         snap_at: properties.snap_at || '1d',
         
         // Navigation
-        scroll_to: properties.scroll_to || "today",
-    };
-    
-    // Process data source if available
-    if (properties.data_source) {
-        // Get tasks from data source
-        const tasks = instance.data.mapBubbleDataToTasks(properties.data_source);
+        // scroll_to: properties.scroll_to_date || instance.data.last_dragged_task_date || "today",
+        scroll_to: "today",
+        today_button: typeof properties.today_button !== 'undefined' ? properties.today_button : true,
         
-        // Reset updated tasks when data source changes completely
-        if (properties.reset_on_data_change === true) {
-            instance.data.resetUpdatedTasks();
-        }
+        // Holiday handling
+        holidays: {
+            'var(--g-weekend-highlight-color)': 'weekend',
+            '#bfdbfe': []
+        },
+        ignore: [],
         
-        // Store original task dates for reference
-        tasks.forEach(task => {
-            if (task.id) {
-                instance.data.originalTaskDates.set(task.id, {
-                    start: new Date(task.start),
-                    end: new Date(task.end)
-                });
+        // Popup configuration
+        popup: function(taskData) {
+            const task = taskData.task;
+            if (!task) {
+                console.warn('No task data provided to popup');
+                return '';
             }
-        });
+            return `
+                <div style="padding: 4px 4px; font-family: Inter, sans-serif; font-size: 12px; color: #333; max-width: 220px; text-align: center;">
+                    <h4 style="margin: 0 0 6px 0; font-size: 14px; font-weighzd;"><strong>${task.name}</strong></h4>
+                    <div>
+                        <div style="margin-bottom: 2px;">${task.start.toLocaleDateString()} <strong>-</strong> ${task.end.toLocaleDateString()}</div>
+                    </div>
+                </div>
+                `;
+        },
         
-        // Check if we need to create or update the chart
-        if (!instance.data.ganttChart) {
-            // First time - create the chart
-            instance.data.ganttChart = new Gantt(instance.data.container, tasks, ganttOptions);
+        // Event handlers
+        on_date_change: function(task, start, end) {
+            if (!task || !task.id) return;
             
-            // Set up event handlers after chart is created
-            instance.data.setupEventHandlers();
+            task._start = start;
+            task._end = end;
             
-            // Initialize updated tasks state
-            instance.publishState('updated_tasks_obj', []);
-            instance.publishState('has_unsaved_changes', false);
-        } else {
-            // Update existing chart
-            instance.data.ganttChart.update_options(ganttOptions);
-            instance.data.ganttChart.refresh(tasks);
+            if (task.dependencies && task.dependencies.length > 0) {
+                const allTasks = instance.data.gantt.tasks;
+                const dependentTasks = allTasks.filter(t => 
+                    task.dependencies.includes(t.id) || 
+                    (t.dependencies && t.dependencies.includes(task.id))
+                );
+                
+                const unrenderedDependencies = dependentTasks.filter(t => !t.$bar);
+                if (unrenderedDependencies.length > 0) {
+                    console.warn('Re-rendering dependencies:', unrenderedDependencies);
+                    unrenderedDependencies.forEach(t => {
+                        if (!t.$bar) {
+                            instance.data.gantt.trigger_task_click(t.id);
+                        }
+                    });
+                    requestAnimationFrame(() => {
+                        instance.data.gantt.refresh(allTasks);
+                    });
+                }
+            }
+        },
+        on_click: function(task) {
+            if (!task || !task.id) return false;
+            return false;
         }
+    };
+
+    // Apply the configuration to the existing Gantt instance
+    if (instance.data.gantt && instance.data.gantt.update_options) {
+        instance.data.gantt.update_options(ganttConfig);
+    }
+  
+    // Map tasks from the Bubble data_source
+    const taskLen = properties.data_source.length();
+    const taskList = properties.data_source.get(0, taskLen);
+    
+    function mapTasks(data) {
+        return data.map(task => {
+            const dependencies = task.get("arrowfrom_text") ? 
+                task.get("arrowfrom_text").split(',').map(id => id.trim()).filter(id => id !== '') : 
+                [];
+            
+            console.log(`Mapping task ${task.get("_id")} with dependencies:`, dependencies);
+            
+            return {
+                id: task.get("_id"),
+                name: task.get("name_text"),
+                start: task.get("start_date_date"),
+                end: task.get("end_date_date"),
+                progress: task.get("progress_number") ? task.get("progress_number") * 100 : 0,
+                dependencies: dependencies
+            };
+        });
     }
     
-    // Reset updating flag after a short delay to ensure all events are complete
-    setTimeout(() => {
-        instance.data.isUpdating = false;
-    }, 500);
+    const tasks = mapTasks(taskList);
+    
+    // If there are no tasks, do nothing
+    if (!tasks || tasks.length === 0) {
+        return;
+    }
+    
+    // Update tasks
+    if (instance.data.gantt && instance.data.gantt.tasks && instance.data.gantt.tasks.length > 0) {
+        // Update existing tasks
+        tasks.forEach(task => {
+            instance.data.gantt.update_task(task.id, task);
+        });
+    } else {
+        // First time loading tasks
+        instance.data.gantt.refresh(tasks);
+    }
 }

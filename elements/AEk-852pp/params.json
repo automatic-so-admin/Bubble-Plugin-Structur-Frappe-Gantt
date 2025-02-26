@@ -7,7 +7,7 @@
         "height": 20,
         "width": 400
     },
-    "display": "Structur Gantt (Save Btn)",
+    "display": "Structur Gantt",
     "events": {
         "AEZ": {
             "caption": "A task is clicked",
@@ -242,23 +242,6 @@
             },
             "name": "wf_end_date",
             "value": "date"
-        },
-        "AGE": {
-            "caption": "updated_tasks_obj",
-            "initialization_code": {
-                "fn": "function(properties, context) {\n\n\n\n}"
-            },
-            "is_list": true,
-            "name": "updated_tasks_obj",
-            "value": "text"
-        },
-        "AGF": {
-            "caption": "has_unsaved_changes",
-            "initialization_code": {
-                "fn": "function(properties, context) {\n\n\n\n}"
-            },
-            "name": "has_unsaved_changes",
-            "value": "boolean"
         }
     }
 }
