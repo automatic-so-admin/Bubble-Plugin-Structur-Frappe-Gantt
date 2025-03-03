@@ -27,6 +27,14 @@ function(instance, properties, context) {
                 .gantt-container .handle-group {
                     cursor: default;
                 }
+
+              /* Make header sticky */
+              .gantt-container .grid-header {
+                  position: sticky !important;
+                  top: 0 !important;
+                  z-index: 100 !important;
+                  background: white !important;
+              }
             `;
         }
     }
@@ -60,7 +68,7 @@ function(instance, properties, context) {
         readonly: properties.read_only || false,
         readonly_dates: properties.read_only || false,
         readonly_progress: properties.read_only || true,
-        move_dependencies: typeof properties.move_dependencies !== 'undefined' ? properties.move_dependencies : true,
+        move_dependencies: true,  // Force this to be true regardless of property
         snap_at: properties.snap_at || '1d',
         
         // Navigation
@@ -93,33 +101,24 @@ function(instance, properties, context) {
         },
         
         // Event handlers
-        on_date_change: function(task, start, end) {
-            if (!task || !task.id) return;
-            
-            task._start = start;
-            task._end = end;
-            
-            if (task.dependencies && task.dependencies.length > 0) {
-                const allTasks = instance.data.gantt.tasks;
-                const dependentTasks = allTasks.filter(t => 
-                    task.dependencies.includes(t.id) || 
-                    (t.dependencies && t.dependencies.includes(task.id))
-                );
-                
-                const unrenderedDependencies = dependentTasks.filter(t => !t.$bar);
-                if (unrenderedDependencies.length > 0) {
-                    console.warn('Re-rendering dependencies:', unrenderedDependencies);
-                    unrenderedDependencies.forEach(t => {
-                        if (!t.$bar) {
-                            instance.data.gantt.trigger_task_click(t.id);
-                        }
-                    });
-                    requestAnimationFrame(() => {
-                        instance.data.gantt.refresh(allTasks);
-                    });
-                }
-            }
-        },
+      on_date_change: function(task, start, end) {
+          if (!task || !task.id) return;
+          
+          // Track changed tasks in this drag session
+          if (!instance.data.changedTasksInCurrentDrag) {
+              instance.data.changedTasksInCurrentDrag = new Map();
+          }
+          instance.data.changedTasksInCurrentDrag.set(task.id, {
+              task: task,
+              oldStart: task.start,
+              oldEnd: task.end,
+              newStart: start,
+              newEnd: end
+          });
+
+          // Let Frappe handle dependency updates
+          return true;
+      },
         on_click: function(task) {
             if (!task || !task.id) return false;
             return false;
@@ -140,8 +139,6 @@ function(instance, properties, context) {
             const dependencies = task.get("arrowfrom_text") ? 
                 task.get("arrowfrom_text").split(',').map(id => id.trim()).filter(id => id !== '') : 
                 [];
-            
-            console.log(`Mapping task ${task.get("_id")} with dependencies:`, dependencies);
             
             return {
                 id: task.get("_id"),

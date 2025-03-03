@@ -142,6 +142,9 @@ function(instance, context) {
             });
         }
     
+        // Initialize changed tasks tracking with more details
+        instance.data.changedTasksInCurrentDrag = new Map();
+    
         // Called when a drag action ends with sequential processing
         function endDrag() {
             const ds = instance.data.dragState;
@@ -149,11 +152,24 @@ function(instance, context) {
             
             ds.dragEndTriggered = true;
             
-            let changedTasks = filterUnchangedTasks(instance.data.gantt.tasks);
-            if (!changedTasks || changedTasks.length === 0) {
-                const activeTask = instance.data.gantt.tasks.find(x => x.id === ds.activeTaskId);
-                if (activeTask) {
-                    changedTasks = [activeTask];
+            let changedTasks = [];
+            
+            // Get all tasks that were changed during drag, including dependencies
+            if (instance.data.changedTasksInCurrentDrag && instance.data.changedTasksInCurrentDrag.size > 0) {
+                changedTasks = Array.from(instance.data.changedTasksInCurrentDrag.values())
+                    .map(change => change.task);
+                
+                console.log(`Processing ${changedTasks.length} tasks changed during drag operation:`, 
+                    changedTasks.map(t => t.id));
+            } else {
+                // Fallback to the original method
+                changedTasks = filterUnchangedTasks(instance.data.gantt.tasks);
+                
+                if (!changedTasks || changedTasks.length === 0) {
+                    const activeTask = instance.data.gantt.tasks.find(x => x.id === ds.activeTaskId);
+                    if (activeTask) {
+                        changedTasks = [activeTask];
+                    }
                 }
             }
 
@@ -172,20 +188,19 @@ function(instance, context) {
                 updatedEnd: task._end
             }));
             
-            // instance.publishState('modified_tasks', JSON.stringify(changedTasks));
+            // Reset the changed tasks tracking
+            instance.data.changedTasksInCurrentDrag = new Map();
             
             const activeTask = instance.data.gantt.tasks.find(x => x.id === ds.activeTaskId);
             if (activeTask) {
                 instance.data.last_dragged_task_date = activeTask._start;
             }
             
-            // instance.publishState('task_id', ds.activeTaskId);
-            // instance.triggerEvent('task_drag_ended');
-            
             instance.data.internalUpdate = true;
             
             // Process tasks sequentially
             (async function processTasksSequentially() {
+                instance.publishState('is_loading', true);
                 for (const taskSnapshot of taskSnapshots) {
                     const indent = taskSnapshot.id === ds.activeTaskId ? '' : '  ';
                     
@@ -199,21 +214,7 @@ function(instance, context) {
                         });
                     }
                     
-                    console.log(`${indent}   Task Details:`, {
-                        name: taskSnapshot.name,
-                        id: taskSnapshot.id,
-                        dependencies: taskSnapshot.dependencies,
-                        start: taskSnapshot.start,
-                        end: taskSnapshot.end,
-                        _start: taskSnapshot._start,
-                        _end: taskSnapshot._end
-                    });
-                    
-                    console.log(`${indent}   Updated Dates:`, {
-                        start: taskSnapshot.updatedStart,
-                        end: taskSnapshot.updatedEnd
-                    });
-                    
+                  
                     // Process this task using the snapshot data
                     instance.publishState('wf_task_id', taskSnapshot.id);
                     instance.publishState('wf_start_date', taskSnapshot.updatedStart);
@@ -225,6 +226,7 @@ function(instance, context) {
                 }
                 
                 console.log('\n✅ Task Update Process Completed ----------------');
+                instance.publishState('is_loading', false);
             })();
         }
     
@@ -405,13 +407,25 @@ function(instance, context) {
 
         // Validate and format tasks
         const validTasks = tasks.map(task => {
+            // Format dependencies consistently
+            let dependencies = [];
+            if (task.dependencies) {
+                if (typeof task.dependencies === 'string') {
+                    // Handle comma-separated string
+                    dependencies = task.dependencies.split(',').map(d => d.trim()).filter(d => d !== '');
+                } else if (Array.isArray(task.dependencies)) {
+                    // Handle array format
+                    dependencies = task.dependencies.filter(d => d && d !== '');
+                }
+            }
+            
             const formattedTask = {
                 id: task.id || String(Date.now()),
                 name: task.name || 'Untitled Task',
                 start: task.start || new Date(),
                 end: task.end || new Date(),
                 progress: Number(task.progress) || 0,
-                dependencies: Array.isArray(task.dependencies) ? task.dependencies : [],
+                dependencies: dependencies,
                 _start: task.start || new Date(),
                 _end: task.end || new Date()
             };

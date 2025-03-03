@@ -242,6 +242,14 @@
             },
             "name": "wf_end_date",
             "value": "date"
+        },
+        "AGE": {
+            "caption": "Is loading",
+            "initialization_code": {
+                "fn": "function(properties, context) {\n\n    return false;\n\n}"
+            },
+            "name": "is_loading",
+            "value": "boolean"
         }
     }
 }
